@@ -32,28 +32,38 @@ TEST(account, test) {
 
 TEST(Transaction, mock) {
     TransactionMock tr;
-    Account a1(1, 1000); 
-    Account a2(2, 2000);
+    AccountMock a1(1, 1000); 
+    AccountMock a2(2, 2000);
     tr.set_fee(250);
-    EXPECT_CALL(tr, SaveToDataBase(testing::Ref(a1), testing::Ref(a2), 500))
-        .Times(1);
-    tr.Make(a1, a2, 499); 
-    tr.Make(a1, a2, 500); 
-    EXPECT_THROW(tr.Make(a1, a1, 500), std::logic_error);
+    EXPECT_CALL(tr, SaveToDataBase(testing::_, testing::_, 500)).Times(1);
+    EXPECT_CALL(a1, Lock()).Times(1);
+    EXPECT_CALL(a2, Lock()).Times(1);
+    EXPECT_CALL(a1, GetBalance()).WillOnce(testing::Return(1000));
+    EXPECT_CALL(a1, ChangeBalance(-500)).Times(1);
+    EXPECT_CALL(a2, ChangeBalance(250)).Times(1);
+    EXPECT_CALL(a2, Unlock()).Times(1);
+    EXPECT_CALL(a1, Unlock()).Times(1);
+    EXPECT_FALSE(tr.Make(a1, a2, 499));
+    EXPECT_TRUE(tr.Make(a1, a2, 500));
     EXPECT_THROW(tr.Make(a1, a2, 99), std::logic_error);
     EXPECT_THROW(tr.Make(a1, a2, -500), std::invalid_argument);
 }
+
 
 TEST(Transaction, test) {
     Transaction tr;
     Account a1(1, 1000);
     Account a2(2, 2000);
     tr.set_fee(250);
-    EXPECT_FALSE(tr.Make(a1, a2, 499));
-    EXPECT_EQ(a1.GetBalance(), 1000);
-    EXPECT_EQ(a2.GetBalance(), 2000);
-    EXPECT_TRUE(tr.Make(a1, a2, 500));
-    EXPECT_EQ(a2.GetBalance(), 1750);
+    EXPECT_FALSE(tr.Make(a1, a2, 499)); 
+    EXPECT_EQ(a1.GetBalance(), 1000); 
+    EXPECT_TRUE(tr.Make(a1, a2, 500)); 
+    EXPECT_EQ(a1.GetBalance(), 500);
+    EXPECT_EQ(a2.GetBalance(), 2250);
+	EXPECT_NO_THROW(a1.Lock()); 
+    EXPECT_NO_THROW(a2.Lock());
+    a1.Unlock();
+    a2.Unlock();
     EXPECT_THROW(tr.Make(a1, a1, 500), std::logic_error);
     EXPECT_THROW(tr.Make(a1, a2, 99), std::logic_error);
     EXPECT_THROW(tr.Make(a1, a2, -500), std::invalid_argument);
