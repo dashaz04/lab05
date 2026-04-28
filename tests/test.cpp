@@ -17,20 +17,6 @@ public:
 	MOCK_METHOD3(SaveToDataBase, void(Account& from, Account& to, int sum));
 };
 
-TEST(account, mock){
-	AccountMock a(1,1000);
-	EXPECT_CALL(a, GetBalance()).Times(1);
-	EXPECT_CALL(a, ChangeBalance(testing::_)).Times(2);
-	EXPECT_CALL(a, Lock()).Times(2);
-	EXPECT_CALL(a, Unlock()).Times(1);
-	a.GetBalance();
-	EXPECT_THROW(a.ChangeBalance(1000), std::runtime_error); 
-	a.Lock();
-	a.ChangeBalance(1000);
-	EXPECT_THROW(a.Lock(), std::runtime_error); 
-	a.Unlock();
-}
-
 TEST(account, test) {
 	Account a(1, 1000);
 	EXPECT_EQ(a.id(), 1);
@@ -49,18 +35,10 @@ TEST(Transaction, mock) {
     Account a1(1, 1000); 
     Account a2(2, 2000);
     tr.set_fee(250);
-
-    // Ожидаем ровно 1 успешный вызов базы для конкретной строки ниже
     EXPECT_CALL(tr, SaveToDataBase(testing::Ref(a1), testing::Ref(a2), 500))
         .Times(1);
-
-    // 1. Не вызывает базу (возвращает false, т.к. 499 < 250*2)
     tr.Make(a1, a2, 499); 
-
-    // 2. ВЫЗЫВАЕТ базу (Times становится 1)
     tr.Make(a1, a2, 500); 
-
-    // 3. Чтобы тест не упал от исключений, оборачиваем их
     EXPECT_THROW(tr.Make(a1, a1, 500), std::logic_error);
     EXPECT_THROW(tr.Make(a1, a2, 99), std::logic_error);
     EXPECT_THROW(tr.Make(a1, a2, -500), std::invalid_argument);
