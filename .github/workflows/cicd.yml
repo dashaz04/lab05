@@ -22,3 +22,16 @@ jobs:
         run: |
           cmake -S . -B build -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}
           cmake --build build
+
+      - name: Run Tests
+        run: ./build/tests/tests
+
+      - name: Generate Coverage
+        run: |
+          lcov --directory . --capture --output-file coverage.info
+          lcov --remove coverage.info '/usr/*' '*/tests/*' '*/googletest/*' --output-file coverage.info
+
+      - name: Upload to Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          file: coverage.info
