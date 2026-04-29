@@ -1,12 +1,16 @@
 cmake_minimum_required(VERSION 3.10)
 project(lab05)
 
-include_directories(../banking)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-add_executable(check 
-    test.cpp 
-    ../banking/Account.cpp 
-    ../banking/Transaction.cpp
+
+add_executable(tests test.cpp)
+target_include_directories(tests PRIVATE
+    ${CMAKE_SOURCE_DIR}/banking
 )
-target_link_libraries(check gtest gtest_main gmock)
+target_link_libraries(tests PRIVATE 
+    banking 
+    GTest::gtest 
+    GTest::gtest_main 
+    GTest::gmock
+)
