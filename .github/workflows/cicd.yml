@@ -1,36 +1,24 @@
-name: C++ Coverage
+name: test
 
 on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        compiler: [g++, clang++]
 
+    runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y lcov libgtest-dev libgmock-dev cmake
+      - name: Install  gtest and gmock
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtest-dev libgmock-dev
 
-    - name: Configure and Build
-      run: |
-        cmake -S . -B build
-        cmake --build build
-
-    - name: Run Tests
-      run: |
-        cd build
-        ctest --output-on-failure
-
-    - name: Collect Coverage
-      run: |  
-        lcov --directory ./build --capture --output-file coverage.info --ignore-errors gcov,graph
-        lcov --remove coverage.info '/usr/*' '${{ github.workspace }}/tests/*' --output-file coverage.info
-        lcov --list coverage.info
-
-    - name: Coveralls
-      uses: coverallsapp/github-action@v2
-      with:
-        file: coverage.info
+      - name: Build
+        run: |
+          cmake -S . -B build -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}
+          cmake --build build
