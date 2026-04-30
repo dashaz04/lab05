@@ -28,8 +28,13 @@ jobs:
           cd build
           ctest --output-on-failure
 
+      - name: Generate Coverage Report
+        run: |
+          sudo apt-get install -y lcov
+          lcov --directory . --capture --output-file coverage.info
+          lcov --remove coverage.info '/usr/*' '*/tests/*' --output-file coverage.info
+
       - name: Coveralls
         uses: coverallsapp/github-action@v2
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          base-path: build
+          file: coverage.info
