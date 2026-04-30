@@ -13,13 +13,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install  gtest and gmock
+      - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtest-dev libgmock-dev
+          sudo apt-get install -y libgtest-dev libgmock-dev lcov
 
       - name: Build
         run: |
-          cmake -S . -B build -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}
+          cmake -S . -B build -DCMAKE_CXX_COMPILER=${{ matrix.compiler }} -DCMAKE_BUILD_TYPE=Debug
           cmake --build build
+          
+      - name: Run Tests
+        run: |
+          cd build
+          ctest --output-on-failure
 
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          base-path: build
