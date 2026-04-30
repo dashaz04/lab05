@@ -25,9 +25,10 @@ jobs:
         ctest --output-on-failure
 
     - name: Collect Coverage
-      run: |
-        lcov --directory . --capture --output-file coverage.info
+      run: |  
+        lcov --directory ./build --capture --output-file coverage.info --ignore-errors gcov,graph
         lcov --remove coverage.info '/usr/*' '${{ github.workspace }}/tests/*' --output-file coverage.info
+        lcov --list coverage.info
 
     - name: Coveralls
       uses: coverallsapp/github-action@v2
