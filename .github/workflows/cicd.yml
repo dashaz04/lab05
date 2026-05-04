@@ -16,9 +16,24 @@ jobs:
       - name: Install  gtest and gmock
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtest-dev libgmock-dev
+          sudo apt-get install -y libgtest-dev libgmock-dev lcov
 
       - name: Build
         run: |
-          cmake -S . -B build -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}
+          cmake -S . -B build -DCMAKE_CXX_COMPILER=${{ matrix.compiler }} -DCMAKE_BUILD_TYPE=Debug
           cmake --build build
+
+      - name: Run Tests
+        working-directory: build
+        run: ctest --output-on-failure
+        
+      - name: data_collect
+        run: |
+          lcov --capture --directory build --output-file cvg.info --rc lcov_branch_coverage=1 --ignore-errors mismatch,inconsistent
+          lcov --remove cvg.info '/usr/*' '*/tests/*' '*/build/*' --output-file cvgf.info
+    
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          file: cvgf.info
+          parallel: true 
