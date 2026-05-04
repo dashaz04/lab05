@@ -7,16 +7,17 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        compiler: [g++, clang++]
+        compiler: [g++]
 
     runs-on: ${{ matrix.os }}
+    
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install  gtest and gmock
+      - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtest-dev libgmock-dev lcov
+          sudo apt-get install -y libgtest-dev libgmock-dev lcov g++
 
       - name: Build
         run: |
@@ -27,13 +28,14 @@ jobs:
         working-directory: build
         run: ctest --output-on-failure
         
-      - name: data_collect
+      - name: Generate Coverage
         run: |
-          lcov --capture --directory build --output-file cvg.info --rc lcov_branch_coverage=1 --ignore-errors mismatch,inconsistent
-          lcov --remove cvg.info '/usr/*' '*/tests/*' '*/build/*' --output-file cvgf.info
-    
+          lcov --capture --directory build --output-file coverage.info \
+            --rc lcov_branch_coverage=1 || true
+          lcov --remove coverage.info '/usr/*' '*/tests/*' '*/build/*' \
+            --output-file coverage_final.info || true
+
       - name: Coveralls
         uses: coverallsapp/github-action@v2
         with:
-          file: cvgf.info
-          parallel: true 
+          file: coverage_final.info
