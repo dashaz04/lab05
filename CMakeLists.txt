@@ -6,6 +6,5 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_compile_options(--coverage -g -O0)
 add_link_options(--coverage)
-
 add_subdirectory(banking)
 add_subdirectory(tests)
