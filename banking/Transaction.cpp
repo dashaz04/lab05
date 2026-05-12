@@ -34,9 +34,10 @@ bool Transaction::Make(Account& from, Account& to, int sum) {
   Guard guard_from(from);
   Guard guard_to(to);
 
-  Credit(to, sum);
-
-  bool success = Debit(to, sum + fee_);
+  bool success = Debit(from, sum + fee_);
+  if (success){
+      Credit(to, sum);
+  }
   if (!success) to.ChangeBalance(-sum);
 
   SaveToDataBase(from, to, sum);
