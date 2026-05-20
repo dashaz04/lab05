@@ -29,8 +29,8 @@ jobs:
         
       - name: Generate Coverage
         run: |
-          lcov --capture --directory build --output-file coverage.info --rc lcov_branch_coverage=1
-          lcov --remove coverage.info '/usr/*' '*/tests/*' '*/build/*' --output-file coverage_final.info
+          lcov --capture --directory build --output-file coverage.info --rc lcov_branch_coverage=1 --ignore-errors mismatch,unused
+          lcov --remove coverage.info '/usr/*' '*/tests/*' '*/build/*' --output-file coverage_final.info --ignore-errors mismatch,unused
 
       - name: Coveralls
         uses: coverallsapp/github-action@v2
