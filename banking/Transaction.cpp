@@ -7,7 +7,6 @@
 #include "Account.h"
 
 namespace {
-// RAII
 struct Guard {
   Guard(Account& account) : account_(&account) { account_->Lock(); }
 
@@ -16,7 +15,7 @@ struct Guard {
  private:
   Account* account_;
 };
-}  // namespace
+}  
 
 Transaction::Transaction() : fee_(1) {}
 
@@ -38,7 +37,6 @@ bool Transaction::Make(Account& from, Account& to, int sum) {
   if (success){
       Credit(to, sum);
   }
-  if (!success) to.ChangeBalance(-sum);
 
   SaveToDataBase(from, to, sum);
   return success;
@@ -51,7 +49,7 @@ void Transaction::Credit(Account& accout, int sum) {
 
 bool Transaction::Debit(Account& accout, int sum) {
   assert(sum > 0);
-  if (accout.GetBalance() > sum) {
+  if (accout.GetBalance() >= sum) {
     accout.ChangeBalance(-sum);
     return true;
   }
