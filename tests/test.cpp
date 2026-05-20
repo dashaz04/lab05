@@ -58,13 +58,23 @@ TEST(Transaction, test) {
     EXPECT_FALSE(tr.Make(a1, a2, 499)); 
     EXPECT_EQ(a1.GetBalance(), 1000); 
     EXPECT_TRUE(tr.Make(a1, a2, 500)); 
-    EXPECT_EQ(a1.GetBalance(), 250);  
-    EXPECT_EQ(a2.GetBalance(), 2500);
-	EXPECT_NO_THROW(a1.Lock()); 
+    EXPECT_EQ(a1.GetBalance(), 250);   
+    EXPECT_EQ(a2.GetBalance(), 2500);  
+    EXPECT_NO_THROW(a1.Lock()); 
     EXPECT_NO_THROW(a2.Lock());
     a1.Unlock();
     a2.Unlock();
     EXPECT_THROW(tr.Make(a1, a1, 500), std::logic_error);
     EXPECT_THROW(tr.Make(a1, a2, 99), std::logic_error);
     EXPECT_THROW(tr.Make(a1, a2, -500), std::invalid_argument);
+    Account a3(3, 100); 
+    Account a4(4, 2000);
+    tr.set_fee(100);    
+    EXPECT_FALSE(tr.Make(a3, a4, 300)); 
+    EXPECT_EQ(a3.GetBalance(), 100);    
+    EXPECT_EQ(a4.GetBalance(), 2000);   
+    Account a5(5, 1000);
+    Account a6(6, 2000);
+    tr.set_fee(1);
+    EXPECT_TRUE(tr.Make(a5, a6, 100));
 }
