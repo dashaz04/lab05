@@ -8,5 +8,4 @@
 3. Настройте сборочную процедуру на **GitHub Actions**.
 [file](.github/workflows/cicd.yml)
 4. Настройте [Coveralls.io](https://coveralls.io/).
-[![Coverage Status](https://coveralls.iorepos/github/dashaz04/lab05/badge.svg?branch=main)](https://coveralls.iogithub/dashaz04/lab05?branch=main)
-
+[![Coverage Status](https://coveralls.io/repos/github/dashaz04/lab05/badge.svg?branch=main)](https://coveralls.io/github/dashaz04/lab05?branch=main)
