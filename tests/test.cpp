@@ -39,8 +39,8 @@ TEST(Transaction, mock) {
     EXPECT_CALL(a1, Lock()).Times(1);
     EXPECT_CALL(a2, Lock()).Times(1);
     EXPECT_CALL(a1, GetBalance()).WillOnce(testing::Return(1000));
-    EXPECT_CALL(a1, ChangeBalance(-500)).Times(1);
-    EXPECT_CALL(a2, ChangeBalance(250)).Times(1);
+    EXPECT_CALL(a1, ChangeBalance(-750)).Times(1);
+    EXPECT_CALL(a2, ChangeBalance(500)).Times(1);
     EXPECT_CALL(a2, Unlock()).Times(1);
     EXPECT_CALL(a1, Unlock()).Times(1);
     EXPECT_FALSE(tr.Make(a1, a2, 499));
@@ -58,8 +58,8 @@ TEST(Transaction, test) {
     EXPECT_FALSE(tr.Make(a1, a2, 499)); 
     EXPECT_EQ(a1.GetBalance(), 1000); 
     EXPECT_TRUE(tr.Make(a1, a2, 500)); 
-    EXPECT_EQ(a1.GetBalance(), 500);
-    EXPECT_EQ(a2.GetBalance(), 2250);
+    EXPECT_EQ(a1.GetBalance(), 250);  
+    EXPECT_EQ(a2.GetBalance(), 2500);
 	EXPECT_NO_THROW(a1.Lock()); 
     EXPECT_NO_THROW(a2.Lock());
     a1.Unlock();
